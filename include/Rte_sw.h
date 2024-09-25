@@ -26,32 +26,59 @@
 #define RTE_SW_H
 
 #include <memory>
-#include "define_bool.h"
+#include "types.h"
+
 
 // Forward declarations.
 template<typename, int> class Array;
-template<typename> class Optical_props_arry;
-template<typename> class Fluxes_broadband;
+template<typename, int> class Array_gpu;
+class Optical_props_arry;
+class Optical_props_arry_gpu;
 
-template<typename TF>
+
 class Rte_sw
 {
     public:
         static void rte_sw(
-                const std::unique_ptr<Optical_props_arry<TF>>& optical_props,
-                const BOOL_TYPE top_at_1,
-                const Array<TF,1>& mu0,
-                const Array<TF,2>& inc_flux_dir,
-                const Array<TF,2>& sfc_alb_dir,
-                const Array<TF,2>& sfc_alb_dif,
-                const Array<TF,2>& inc_flux_dif,
-                Array<TF,3>& gpt_flux_up,
-                Array<TF,3>& gpt_flux_dn,
-                Array<TF,3>& gpt_flux_dir);
+                const std::unique_ptr<Optical_props_arry>& optical_props,
+                const Bool top_at_1,
+                const Array<Float,1>& mu0,
+                const Array<Float,2>& inc_flux_dir,
+                const Array<Float,2>& sfc_alb_dir,
+                const Array<Float,2>& sfc_alb_dif,
+                const Array<Float,2>& inc_flux_dif,
+                Array<Float,3>& gpt_flux_up,
+                Array<Float,3>& gpt_flux_dn,
+                Array<Float,3>& gpt_flux_dir);
 
         static void expand_and_transpose(
-                const std::unique_ptr<Optical_props_arry<TF>>& ops,
-                const Array<TF,2> arr_in,
-                Array<TF,2>& arr_out);
+                const std::unique_ptr<Optical_props_arry>& ops,
+                const Array<Float,2> arr_in,
+                Array<Float,2>& arr_out);
 };
+
+
+#ifdef USECUDA
+class Rte_sw_gpu
+{
+    public:
+        void rte_sw(
+                const std::unique_ptr<Optical_props_arry_gpu>& optical_props,
+                const Bool top_at_1,
+                const Array_gpu<Float,1>& mu0,
+                const Array_gpu<Float,2>& inc_flux_dir,
+                const Array_gpu<Float,2>& sfc_alb_dir,
+                const Array_gpu<Float,2>& sfc_alb_dif,
+                const Array_gpu<Float,2>& inc_flux_dif,
+                Array_gpu<Float,3>& gpt_flux_up,
+                Array_gpu<Float,3>& gpt_flux_dn,
+                Array_gpu<Float,3>& gpt_flux_dir);
+
+        void expand_and_transpose(
+                const std::unique_ptr<Optical_props_arry_gpu>& ops,
+                const Array_gpu<Float,2> arr_in,
+                Array_gpu<Float,2>& arr_out);
+};
+#endif
+
 #endif

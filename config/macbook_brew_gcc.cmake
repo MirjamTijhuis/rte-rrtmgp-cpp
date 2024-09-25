@@ -4,9 +4,9 @@ if(USEMPI)
   set(ENV{CXX} mpicxx) # C++ compiler for parallel build
   set(ENV{FC}  mpif90) # Fortran compiler for parallel build
 else()
-  set(ENV{CC}  gcc-10)      # C compiler for serial build
-  set(ENV{CXX} g++-10)      # C++ compiler for serial build
-  set(ENV{FC}  gfortran-10) # Fortran compiler for parallel build
+  set(ENV{CC}  gcc-11)      # C compiler for serial build
+  set(ENV{CXX} g++-11)      # C++ compiler for serial build
+  set(ENV{FC}  gfortran-11) # Fortran compiler for parallel build
 endif()
 
 set(GNU_SED "gsed")
@@ -27,4 +27,6 @@ set(LIBS ${NETCDF_LIB_CPP} ${NETCDF_LIB_C} ${HDF5_LIB_2} ${HDF5_LIB_1} ${SZIP_LI
 set(INCLUDE_DIRS ${FFTW_INCLUDE_DIR} ${NETCDF_INCLUDE_DIR})
 
 add_definitions(-DRESTRICTKEYWORD=__restrict__)
-add_definitions(-DUSE_CBOOL)
+add_definitions(-DRTE_USE_CBOOL)
+#add_definitions(-DRTE_RRTMGP_GPU_MEMPOOL_OWN)
+#add_definitions(-DRTE_RRTMGP_GPU_MEMPOOL_CUDA)

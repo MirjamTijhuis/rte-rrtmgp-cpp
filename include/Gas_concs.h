@@ -29,25 +29,30 @@
 #include <vector>
 #include <string>
 
-#include "define_bool.h"
+#include "types.h"
 
 template<typename, int> class Array;
 
-template<typename TF>
+#ifdef USECUDA
+class Gas_concs_gpu;
+#endif
+
+
 class Gas_concs
 {
     public:
-        Gas_concs() {}
+        Gas_concs() = default;
         Gas_concs(const Gas_concs& gas_concs_ref, const int start, const int size);
+        ~Gas_concs();
 
         // Insert new gas into the map.
-        void set_vmr(const std::string& name, const TF data);
-        void set_vmr(const std::string& name, const Array<TF,1>& data);
-        void set_vmr(const std::string& name, const Array<TF,2>& data);
+        void set_vmr(const std::string& name, const Float data);
+        void set_vmr(const std::string& name, const Array<Float,1>& data);
+        void set_vmr(const std::string& name, const Array<Float,2>& data);
 
-        // Insert new gas into the map.
-        // void get_vmr(const std::string& name, Array<TF,2>& data) const;
-        const Array<TF,2>& get_vmr(const std::string& name) const;
+        // Retrieve gas from the map.
+        // void get_vmr(const std::string& name, Array<Float,2>& data) const;
+        const Array<Float,2>& get_vmr(const std::string& name) const;
 
         // Remove gas
         void remove_vmr(const std::string& name);
@@ -56,9 +61,41 @@ class Gas_concs
         std::vector<std::string> gas_names();
 
         // Check if gas exists in map.
-        BOOL_TYPE exists(const std::string& name) const;
+        Bool exists(const std::string& name) const;
 
     private:
-        std::map<std::string, Array<TF,2>> gas_concs_map;
+        std::map<std::string, Array<Float,2>> gas_concs_map;
+
+        #ifdef USECUDA
+        friend class Gas_concs_gpu;
+        friend class Gas_concs_rt;
+        #endif
 };
+
+
+#ifdef USECUDA
+template<typename, int> class Array_gpu;
+
+
+class Gas_concs_gpu
+{
+    public:
+        Gas_concs_gpu() = default;
+        Gas_concs_gpu(const Gas_concs& gas_concs_ref);
+        Gas_concs_gpu(const Gas_concs_gpu& gas_concs_ref, const int start, const int size);
+        ~Gas_concs_gpu();
+
+        const Array_gpu<Float,2>& get_vmr(const std::string& name) const;
+ 
+        void set_vmr(const std::string& name, const Array<Float,2>& data);
+        void set_vmr(const std::string& name, const Array_gpu<Float,2>& data);
+
+        // Check if gas exists in map.
+        Bool exists(const std::string& name) const;
+
+    private:
+        std::map<std::string, Array_gpu<Float,2>> gas_concs_map;
+};
+#endif
+
 #endif
