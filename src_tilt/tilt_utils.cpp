@@ -450,9 +450,10 @@ void compress_columns_p_or_t(const int n_x, const int n_y,
             for (int ix = 0; ix < n_x; ++ix)
             {
                 const int out_idx = ix + iy * n_x + ilay * n_x * n_y;
+                const int out_idx_top = ix + iy * n_x + (ilay+1) * n_x * n_y;
                 const float dz =  zh.v()[ilay+1] - zh.v()[ilay];
                 var_tmp_lay[out_idx] = (var_tmp_lev[out_idx] * (z.v()[ilay] - zh.v()[ilay]) / dz
-                                        + var_tmp_lev[out_idx + 1] * (zh.v()[ilay + 1] - z.v()[ilay]) / dz);
+                                        + var_tmp_lev[out_idx_top] * (zh.v()[ilay + 1] - z.v()[ilay]) / dz);
             }
         }
     }
