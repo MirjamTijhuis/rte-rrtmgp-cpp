@@ -542,11 +542,11 @@ void solve_radiation(int argc, char** argv)
 
         p_lev_tilt_gpu.set_dims({n_zh_tilt_center});
 
-        for (int icol=1; icol<=n_col; ++icol)
-        {
-            mu0({icol}) = 1.0;
-            azi({icol}) = 0.0;
-        }
+//        for (int icol=1; icol<=n_col; ++icol)
+//        {
+//            mu0({icol}) = 1.0;
+//            azi({icol}) = 0.0;
+//        }
 
         tica_tilt_gpu(
                 tica_sza, tica_azi,
@@ -843,7 +843,8 @@ void solve_radiation(int argc, char** argv)
         {
             for (int icol=1; icol<=n_col; ++icol)
             {
-                tica_scaling({icol}) = std::cos(tica_sza);
+                // tica_scaling({icol}) = std::cos(tica_sza);
+                tica_scaling({icol}) = Float(1.);
             }
         }
 

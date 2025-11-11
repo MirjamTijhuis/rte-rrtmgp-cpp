@@ -434,10 +434,10 @@ void solve_radiation(int argc, char** argv)
         center_path.set_dims({n_z_tilt_center});
         center_zh_tilt.set_dims({n_zh_tilt_center});
 
-        for (int icol = 1; icol <= n_col; ++icol) {
-            mu0({icol}) = 1.0;
-            azi({icol}) = 0.0;
-        }
+//        for (int icol = 1; icol <= n_col; ++icol) {
+//            mu0({icol}) = 1.0;
+//            azi({icol}) = 0.0;
+//        }
 
         std::vector<std::string> gas_names = {
                 "h2o", "co2", "o3", "n2o", "co", "ch4", "o2", "n2", "ccl4", "cfc11",
@@ -795,12 +795,13 @@ void solve_radiation(int argc, char** argv)
         {
             for (int icol=1; icol<=n_col; ++icol)
             {
-                tica_scaling({icol}) = std::cos(tica_sza);
+                // tica_scaling({icol}) = std::cos(tica_sza);
+                tica_scaling({icol}) = Float(1.);
             }
-            for (int icol = 1; icol <= n_col; ++icol)
-            {
-                mu0({icol}) = 1.0;
-            }
+//            for (int icol = 1; icol <= n_col; ++icol)
+//            {
+//                mu0({icol}) = 1.0;
+//            }
         }
 
         // Create output arrays.
