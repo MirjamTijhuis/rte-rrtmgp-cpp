@@ -296,6 +296,24 @@ namespace Tilted_column_cuda
         }
     }
 
+    __global__
+    void copy_twostream_fluxes_gpu(const int n_x, const int n_y, const int n_z, const int n_lev_in,
+                                        const ijk* tilted_path,
+                                        const int* tilted_path_bounds,
+                                        const Float* flux_in,
+                                        Float* flux_out)
+    {
+        const int ix = blockIdx.x*blockDim.x + threadIdx.x;
+        const int iy = blockIdx.y*blockDim.y + threadIdx.y;
+        const int iz = blockIdx.z*blockDim.z + threadIdx.z;
+
+        if ( ( ix < n_x) && ( iy < n_y) && (iz < n_lev_in) )
+        {
+            const int idx_out = ix + iy * n_x + iz * n_y * n_x;
+            flux_out[idx_out] = flux_in[idx_out];
+        }
+    }
+
 
     __global__
     void translate_absorption_gpu(const int n_x, const int n_y,
@@ -330,6 +348,51 @@ namespace Tilted_column_cuda
                     const int idx_in = modulo_x + modulo_y * n_x + iz * n_y * n_x;
                     abs_out[idx_out] += abs_in[idx_in] * dp_local / dp_total;
                 }
+            }
+            else
+            {
+                const int i_tilt = tilted_path_bounds[n_z_in];
+                const ijk offset = tilted_path[i_tilt];
+
+                const int idx_out = ix + iy * n_x + iz * n_y * n_x;
+                const int modulo_x = ix - offset.i < 0 ? (ix - offset.i)% n_x + n_x: (ix - offset.i)% n_x;
+                const int modulo_y = iy - offset.j < 0 ? (iy - offset.j)% n_y + n_y: (iy - offset.j)% n_y;
+                const int idx_in = modulo_x + modulo_y * n_x + iz * n_y * n_x;
+                abs_out[idx_out] += abs_in[idx_in];
+
+
+            }
+        }
+    }
+
+    __global__
+    void translate_absorption_gpu_simple(const int n_x, const int n_y,
+                                  const int n_z_in, const int n_z,
+                                  const ijk* tilted_path,
+                                  const int* tilted_path_bounds,
+                                  const Float* abs_in,
+                                  Float* abs_out)
+    {
+        const int ix = blockIdx.x*blockDim.x + threadIdx.x;
+        const int iy = blockIdx.y*blockDim.y + threadIdx.y;
+        const int iz = blockIdx.z*blockDim.z + threadIdx.z;
+
+        if ( ( ix < n_x) && ( iy < n_y) && (iz < n_z) )
+        {
+            if (iz < n_z_in)
+            {
+                const int i_tilt_lwr = tilted_path_bounds[iz];
+                const int i_tilt_upr = tilted_path_bounds[iz+1];
+                const int i_tilt = int((i_tilt_lwr + i_tilt_upr)/2);
+
+                const ijk offset = tilted_path[i_tilt];
+
+                const int idx_out = ix + iy * n_x + iz * n_y * n_x;
+                const int modulo_x = ix - offset.i < 0 ? (ix - offset.i)% n_x + n_x: (ix - offset.i)% n_x;
+                const int modulo_y = iy - offset.j < 0 ? (iy - offset.j)% n_y + n_y: (iy - offset.j)% n_y;
+                const int idx_in = modulo_x + modulo_y * n_x + iz * n_y * n_x;
+                abs_out[idx_out] += abs_in[idx_in];
+
             }
             else
             {

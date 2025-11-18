@@ -203,8 +203,32 @@ namespace Tilted_column_cuda
     __global__
     void tica_profile_to_3d(const int n_x, const int n_y, const int n_z,
                             const Float n_col_inv,
-                            const Float* profile,
-                            Float* field);
+                            const Float *profile,
+                            Float *field);
+
+    __global__
+    void translate_absorption_gpu(const int n_x, const int n_y,
+                                  const int n_z_in, const int n_z,
+                                  const ijk *tilted_path,
+                                  const int *tilted_path_bounds,
+                                  const Float *p_lev_tilt,
+                                  const Float *abs_in,
+                                  Float *abs_out);
+
+    __global__
+    void translate_absorption_gpu_simple(const int n_x, const int n_y,
+                                  const int n_z_in, const int n_z,
+                                  const ijk *tilted_path,
+                                  const int *tilted_path_bounds,
+                                  const Float *abs_in,
+                                  Float *abs_out);
+
+    __global__
+    void copy_twostream_fluxes_gpu(const int n_x, const int n_y, const int n_z, const int n_lev_in,
+                                   const ijk *tilted_path,
+                                   const int *tilted_path_bounds,
+                                   const Float *flux_in,
+                                   Float *flux_out);
 }
 
 /// GPU functions
